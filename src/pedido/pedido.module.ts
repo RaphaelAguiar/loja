@@ -8,12 +8,14 @@ import { DatabaseModule } from '../database/database.module';
 import { ClienteModule } from '../cliente/cliente.module';
 import { ProdutoModule } from '../produto/produto.module';
 import { PedidoItem } from './pedido-item.entity';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
     DatabaseModule,
     forwardRef(() => ClienteModule),
     forwardRef(() => ProdutoModule),
+    EmailModule,
   ],
   controllers: [PedidoController],
   providers: [

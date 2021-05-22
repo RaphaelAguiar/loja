@@ -10,15 +10,18 @@ import { ProdutoService } from '../produto/produto.service';
 import { ClienteService } from '../cliente/cliente.service';
 import { Cliente, EnumSexoCliente } from '../cliente/cliente.entity';
 import { EnumCorProduto, Produto } from '../produto/produto.entity';
+import { EmailService } from '../email/email.service';
 
 jest.mock('./pedido.repository');
 jest.mock('../produto/produto.service');
 jest.mock('../cliente/cliente.service');
+jest.mock('../email/email.service');
 
 describe('PedidoService', () => {
   const mockPedidoRepository = PedidoRepository as any;
   const mockClienteService = ClienteService as any;
   const mockProdutoService = ProdutoService as any;
+  const mockEmailService = EmailService as any;
 
   let pedidoService: PedidoService;
 
@@ -26,6 +29,7 @@ describe('PedidoService', () => {
     mockPedidoRepository.mockClear();
     mockClienteService.mockClear();
     mockProdutoService.mockClear();
+    mockEmailService.mockClear();
 
     const app: TestingModule = await Test.createTestingModule({
       providers: [
@@ -33,6 +37,7 @@ describe('PedidoService', () => {
         PedidoService,
         ProdutoService,
         ClienteService,
+        EmailService,
       ],
     }).compile();
 
@@ -577,5 +582,51 @@ describe('PedidoService', () => {
     expect(repositoryInstance.findByCodigoProduto).toBeCalledWith(1);
 
     expect(pedidos).toEqual(pedidosBanco);
+  });
+
+  it('testa envio de email com sucesso', async () => {
+    const emailServiceInstance = mockEmailService.mock.instances[0];
+    const repositoryInstance = mockPedidoRepository.mock.instances[0];
+
+    const cliente: Cliente = {
+      codigo_cliente: 3,
+      cpf: '11111111111',
+      email: 'email@gmail.com',
+      nome: 'cliente da silva',
+      sexo: EnumSexoCliente.Masculino,
+    };
+
+    const produto: Produto = {
+      codigo_produto: 2,
+      cor: EnumCorProduto.Amarelo,
+      nome: 'produto 2',
+      tamanho: 1,
+      valor: 2,
+    };
+    const pedido: Pedido = {
+      cliente,
+      codigo_do_pedido: 1,
+      data_do_pedido: new Date(),
+      forma_de_pagamento: EnumFormaPagamentoPedido.Dinheiro,
+      itens: [
+        {
+          pedido: null,
+          produto,
+          quantidade: 1,
+        },
+      ],
+    };
+
+    repositoryInstance.findOne.mockResolvedValue(pedido);
+    await pedidoService.sendEmail(1);
+    expect(emailServiceInstance.send).toBeCalled();
+  });
+
+  it('testa envio de email pedido não encontrado', async () => {
+    const repositoryInstance = mockPedidoRepository.mock.instances[0];
+    repositoryInstance.findOne.mockResolvedValue(null);
+    await expect(pedidoService.sendEmail(1)).rejects.toEqual(
+      new ErroLoja(consts.PEDIDO_EMAIL_NAO_ENCONTRADO),
+    );
   });
 });

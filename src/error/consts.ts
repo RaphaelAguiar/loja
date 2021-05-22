@@ -49,3 +49,8 @@ export const ITENS_PEDIDO_NAO_ENCONTRADOS =
   'Um ou mais itens deste pedido não foi encontrado';
 export const QUANTIDADE_ITENM_PEDIDO_INVALIDA =
   'A quantidade mínima de um item no pedido é 1';
+
+//Email
+export const FUNCIONALIDADE_EMAIL_NAO_CONFIGURADA =
+  'Funcionalidade de envio de email não configurada';
+export const PEDIDO_EMAIL_NAO_ENCONTRADO = 'Pedido não encontrado';

@@ -4,11 +4,13 @@ import { ErroLoja } from '../error/erro-loja';
 import { PedidoController } from './pedido.controller';
 import { EnumFormaPagamentoPedido, Pedido } from './pedido.entity';
 import { PedidoService } from './pedido.service';
+
 const request = require('supertest');
 jest.mock('./pedido.service');
 
 describe('PedidoController', () => {
   const mockPedidoService = PedidoService as any;
+
   let app: INestApplication;
   beforeAll(async () => {
     mockPedidoService.mockClear();
@@ -132,5 +134,13 @@ describe('PedidoController', () => {
       .put('/pedidos/1')
       .set('Content-Type', 'application/json')
       .expect(200);
+  });
+
+  it('implementar chamada com sucesso para o endpoint email', async () => {
+    const serviceInstance = mockPedidoService.mock.instances[0];
+    await request(app.getHttpServer())
+      .post('/pedidos/1/sendemail')
+      .expect(201);
+    expect(serviceInstance.sendEmail).toHaveBeenCalledWith(1);
   });
 });

@@ -49,4 +49,9 @@ export class PedidoController {
   async delete(@Param('codigo') codigo_do_pedido: number) {
     return await this.pedidoService.delete(+codigo_do_pedido);
   }
+
+  @Post(':codigo/sendemail')
+  async sendEmail(@Param('codigo') codigo_do_pedido: number) {
+    return await this.pedidoService.sendEmail(+codigo_do_pedido);
+  }
 }

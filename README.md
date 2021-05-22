@@ -14,6 +14,16 @@ DATABASE_DATABASE obrigatório
 
 SERVER_PORT padrão 3000
 
+Para utilizar a funcionalidade de envio de email defina as seguintes variaveis
+
+EMAIL_SMTP_HOST
+EMAIL_SMTP_PORT
+EMAIL_SMTP_AUTH_USER
+EMAIL_SMTP_AUTH_PASS
+EMAIL_SMTP_FROM
+
+Segue tutorial de configuração do gmail para smtp: https://www.gmass.co/blog/gmail-smtp/
+
 Exemplo de comando via terminal para definição das variaveis de ambiente
 export DATABASE_HOSTNAME=localhost
 
@@ -32,3 +42,9 @@ Para executar os testes unitários execute o comando 'npm run start' no terminal
 Execute o build com 'npm run build' para realizar o build de produção e em seguida o comando 'start:prod' para iniciar aplicação
 
 O arquivo Loja.postman_collection.json contém exemplos de requests para validação das rotas
+
+## Pendencias
+
+- Adicionar ferramenta que permita a composição de um email formatado a partir de um template
+- Refatorar uso do jest para utilizar as vantagens do TypeScript
+

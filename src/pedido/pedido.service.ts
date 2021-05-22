@@ -8,7 +8,7 @@ import { EnumFormaPagamentoPedido, Pedido } from './pedido.entity';
 import { ClienteService } from '../cliente/cliente.service';
 import { ProdutoService } from '../produto/produto.service';
 import { PedidoItem } from './pedido-item.entity';
-import { timeStamp } from 'console';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class PedidoService {
@@ -18,6 +18,7 @@ export class PedidoService {
     private readonly clienteService: ClienteService,
     @Inject(forwardRef(() => ProdutoService))
     private readonly produtoService: ProdutoService,
+    private readonly emailService: EmailService,
   ) {}
 
   async findOne(codigo_do_pedido: number) {
@@ -120,5 +121,45 @@ export class PedidoService {
     this.validacoesGerais(pedidoSimple);
     const pedido = await this.loadPedido(pedidoSimple);
     return await this.pedidoRepository.save(pedido);
+  }
+
+  async sendEmail(codigo_do_pedido: number) {
+    const pedido = await this.findOne(codigo_do_pedido);
+
+    if (!pedido) {
+      throw new ErroLoja(consts.PEDIDO_EMAIL_NAO_ENCONTRADO);
+    }
+
+    const html =
+      '<html><body>' +
+      [
+        'Obrigado pro comprar na loja',
+        'Seguem os detalhes do seu pedido',
+        `Número do pedido: ${codigo_do_pedido}`,
+        `Nome do cliente:  ${pedido.cliente.nome}`,
+        `Email do cliente:  ${pedido.cliente.email}`,
+        `CPF do cliente:  ${pedido.cliente.cpf}`,
+        `Gênero do cliente:  ${pedido.cliente.cpf}`,
+        ...pedido.itens.map(item => {
+          return `${item.quantidade} unidade de '${
+            item.produto.nome
+          }' por R$${item.produto.valor.toFixed(2)} (${(
+            item.quantidade * item.produto.valor
+          ).toFixed(2)})`;
+        }),
+        `Total do pedido: ${pedido.itens.reduce(
+          (a, p) => a + p.quantidade * p.produto.valor,
+          0,
+        ).toFixed(2)}`,
+      ]
+        .map(l => `<p>${l}</p>`)
+        .join('') +
+      '</body></html>';
+
+    await this.emailService.send({
+      to: pedido.cliente.email,
+      subject: 'Detalhes do Pedido',
+      html,
+    });
   }
 }

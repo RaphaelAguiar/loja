@@ -26,6 +26,7 @@
     "cpf-teste": "^1.0.3",
     "lodash": "^4.17.21",
     "mysql2": "^2.2.5",
+    "nodemailer": "^6.6.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3",
