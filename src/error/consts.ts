@@ -31,3 +31,21 @@ export const TAMANHO_PRODUTO_INVALIDO = 'Tamanho inválido';
 export const VALOR_PRODUTO_OBRIGATORIO =
   'O preenchimento do campo "Valor" é obrigatório';
 export const VALOR_PRODUTO_INVALIDO = 'Valor inválido';
+export const NAO_PODE_SER_EXCLUIDO_PRESENTE_PEDIDO = 'Este produto não pode ser excluído, pois está presente em um pedido'
+
+//Pedido
+export const PEDIDO_NAO_ENCONTRADO = 'Pedido não encontrado';
+export const CLIENTE_PEDIDO_OBRIGATORIO =
+  'O preenchimento do campo "Cliente" é obrigatório';
+export const CLIENTE_PEDIDO_NAO_ENCONTRADO = 'Cliente do pedido não encontrado';
+export const ITENS_PEDIDO_OBRIGATORIO_NAO_VAZIO =
+  'O preenchimento do campo "Itens" é obrigatório com pelo menos um item';
+export const DATA_PEDIDO_OBRIGATORIA =
+  'O campo data do pedido não foi informado ou contem uma data inválida';
+export const FORMA_DE_PAGAMENTO_PEDIDO_OBRIGATORIO =
+  'O preenchimento do campo "Forma de Pagamento" é obrigatório';
+export const FORMA_DE_PAGAMENTO_PEDIDO_INVALIDA = 'Forma de pagamento inválida';
+export const ITENS_PEDIDO_NAO_ENCONTRADOS =
+  'Um ou mais itens deste pedido não foi encontrado';
+export const QUANTIDADE_ITENM_PEDIDO_INVALIDA =
+  'A quantidade mínima de um item no pedido é 1';

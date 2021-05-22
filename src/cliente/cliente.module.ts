@@ -1,13 +1,14 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ClienteController } from './cliente.controller';
 import { ClienteService } from './cliente.service';
 import { Cliente } from './cliente.entity';
 import { Connection } from 'typeorm';
 import { ClienteRepository } from './cliente.repository';
 import { DatabaseModule } from '../database/database.module';
+import { PedidoModule } from '../pedido/pedido.module';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, forwardRef(() => PedidoModule)],
   controllers: [ClienteController],
   providers: [
     {
@@ -18,5 +19,6 @@ import { DatabaseModule } from '../database/database.module';
     ClienteRepository,
     ClienteService,
   ],
+  exports: [ClienteService],
 })
 export class ClienteModule {}

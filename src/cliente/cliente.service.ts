@@ -1,17 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ErroLoja } from '../error/erro-loja';
 import { Cliente, EnumSexoCliente } from './cliente.entity';
 import { ClienteRepository } from './cliente.repository';
 import { calcDv } from 'cpf-teste';
 import * as consts from '../error/consts';
-import { throwError } from 'rxjs';
 import _ = require('lodash');
+import { PedidoService } from '../pedido/pedido.service';
 
 @Injectable()
 export class ClienteService {
   private readonly regexEmailValido = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-  constructor(private readonly clienteRepository: ClienteRepository) {}
+  constructor(
+    private readonly clienteRepository: ClienteRepository,
+    @Inject(forwardRef(() => PedidoService))
+    private readonly pedidoService: PedidoService,
+  ) {}
 
   async findOne(codigo_cliente: number) {
     return await this.clienteRepository.findOne(codigo_cliente);
@@ -52,7 +56,8 @@ export class ClienteService {
   }
 
   async delete(codigo_cliente: number) {
-    return await this.clienteRepository.delete(codigo_cliente)
+    await this.pedidoService.deleteByCodigoCliente(codigo_cliente);
+    return await this.clienteRepository.delete(codigo_cliente);
   }
 
   async update(cliente: Cliente) {

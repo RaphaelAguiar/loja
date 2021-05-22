@@ -1,14 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import * as _ from 'lodash';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ErroLoja } from '../error/erro-loja';
 import { EnumCorProduto, Produto } from './produto.entity';
 import { ProdutoRepository } from './produto.repository';
-import { calcDv } from 'cpf-teste';
 import * as consts from '../error/consts';
-import _ = require('lodash');
+import { PedidoService } from '../pedido/pedido.service';
 
 @Injectable()
 export class ProdutoService {
-  constructor(private readonly produtoRepository: ProdutoRepository) {}
+  constructor(
+    private readonly produtoRepository: ProdutoRepository,
+    @Inject(forwardRef(() => PedidoService))
+    private readonly pedidoService: PedidoService,
+  ) {}
 
   async findOne(codigo_produto: number) {
     return await this.produtoRepository.findOne(codigo_produto);
@@ -34,11 +38,17 @@ export class ProdutoService {
 
     if (!this.corValida(produto.cor))
       throw new ErroLoja(consts.COR_PRODUTO_INVALIDA);
-    if (produto.tamanho <= 0) throw new ErroLoja(consts.TAMANHO_PRODUTO_INVALIDO);
+    if (produto.tamanho <= 0)
+      throw new ErroLoja(consts.TAMANHO_PRODUTO_INVALIDO);
     if (produto.valor <= 0) throw new ErroLoja(consts.VALOR_PRODUTO_INVALIDO);
   }
 
   async delete(codigo_produto: number) {
+    if (
+      !_.isEmpty(await this.pedidoService.findByCodigoProduto(codigo_produto))
+    ) {
+      throw new ErroLoja(consts.NAO_PODE_SER_EXCLUIDO_PRESENTE_PEDIDO);
+    }
     return await this.produtoRepository.delete(codigo_produto);
   }
 

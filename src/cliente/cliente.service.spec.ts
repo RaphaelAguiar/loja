@@ -3,19 +3,23 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ClienteService } from './cliente.service';
 import { Cliente, EnumSexoCliente } from './cliente.entity';
 import { ClienteRepository } from './cliente.repository';
+import { PedidoService } from '../pedido/pedido.service';
 import { ErroLoja } from '../error/erro-loja';
 import * as consts from '../error/consts';
 jest.mock('./cliente.repository');
+jest.mock('../pedido/pedido.service');
 
 describe('ClienteService', () => {
   const mockClienteRepository = ClienteRepository as any;
+  const mockPedidoService = PedidoService as any;
   let clienteService: ClienteService;
 
   beforeEach(async () => {
     mockClienteRepository.mockClear();
+    mockPedidoService.mockClear();
 
     const app: TestingModule = await Test.createTestingModule({
-      providers: [ClienteRepository, ClienteService],
+      providers: [ClienteRepository, ClienteService, PedidoService],
     }).compile();
 
     clienteService = app.get<ClienteService>(ClienteService);
@@ -191,7 +195,9 @@ describe('ClienteService', () => {
 
   it('teste deleção cliente', async () => {
     const repositoryInstance = mockClienteRepository.mock.instances[0];
+    const pedidoServiceInstance = mockPedidoService.mock.instances[0];
     await clienteService.delete(1);
+    expect(pedidoServiceInstance.deleteByCodigoCliente).toBeCalledWith(1);
     expect(repositoryInstance.delete).toBeCalledWith(1);
   });
 

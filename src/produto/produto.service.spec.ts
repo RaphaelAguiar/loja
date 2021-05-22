@@ -5,17 +5,21 @@ import { EnumCorProduto, Produto } from './produto.entity';
 import { ProdutoRepository } from './produto.repository';
 import { ErroLoja } from '../error/erro-loja';
 import * as consts from '../error/consts';
+import { PedidoService } from '../pedido/pedido.service';
 jest.mock('./produto.repository');
+jest.mock('../pedido/pedido.service');
 
 describe('ProdutoService', () => {
   const mockProdutoRepository = ProdutoRepository as any;
+  const mockPedidoService = PedidoService as any;
   let produtoService: ProdutoService;
 
   beforeEach(async () => {
     mockProdutoRepository.mockClear();
+    mockPedidoService.mockClear();
 
     const app: TestingModule = await Test.createTestingModule({
-      providers: [ProdutoRepository, ProdutoService],
+      providers: [ProdutoRepository, ProdutoService, PedidoService],
     }).compile();
 
     produtoService = app.get<ProdutoService>(ProdutoService);
@@ -129,6 +133,16 @@ describe('ProdutoService', () => {
     const repositoryInstance = mockProdutoRepository.mock.instances[0];
     await produtoService.delete(1);
     expect(repositoryInstance.delete).toBeCalledWith(1);
+  });
+
+  it('teste deleção produto em pedido', async () => {
+    const pedidoServiceInstance = mockPedidoService.mock.instances[0];
+
+    pedidoServiceInstance.findByCodigoProduto.mockResolvedValue([{}]);
+
+    await expect(produtoService.delete(1)).rejects.toEqual(
+      new ErroLoja(consts.NAO_PODE_SER_EXCLUIDO_PRESENTE_PEDIDO),
+    );
   });
 
   it('teste busca todos produtos', async () => {

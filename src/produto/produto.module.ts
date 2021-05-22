@@ -1,13 +1,14 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ProdutoController } from './produto.controller';
 import { ProdutoService } from './produto.service';
 import { Produto } from './produto.entity';
 import { Connection } from 'typeorm';
 import { ProdutoRepository } from './produto.repository';
-import { DatabaseModule } from '../database/database.module'
+import { DatabaseModule } from '../database/database.module';
+import { PedidoModule } from '../pedido/pedido.module';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, forwardRef(() => PedidoModule)],
   controllers: [ProdutoController],
   providers: [
     {
@@ -18,5 +19,6 @@ import { DatabaseModule } from '../database/database.module'
     ProdutoRepository,
     ProdutoService,
   ],
+  exports: [ProdutoService],
 })
 export class ProdutoModule {}
