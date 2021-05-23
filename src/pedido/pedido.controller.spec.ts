@@ -136,11 +136,28 @@ describe('PedidoController', () => {
       .expect(200);
   });
 
-  it('implementar chamada com sucesso para o endpoint email', async () => {
+  it('teste chamada com sucesso para o endpoint email', async () => {
     const serviceInstance = mockPedidoService.mock.instances[0];
     await request(app.getHttpServer())
       .post('/pedidos/1/sendemail')
       .expect(201);
     expect(serviceInstance.sendEmail).toHaveBeenCalledWith(1);
+  });
+
+  it('teste chamada com sucesso para a geração de report', async () => {
+    const serviceInstance = mockPedidoService.mock.instances[0];
+
+    const descartar = jest.fn();
+    serviceInstance.gerarPdf.mockResolvedValue({
+      path: 'package.json',
+      descartar,
+    });
+
+    await request(app.getHttpServer())
+      .post('/pedidos/1/report')
+      .expect(201);
+
+    expect(serviceInstance.gerarPdf).toHaveBeenCalledWith(1);
+    expect(descartar).toBeCalled();
   });
 });

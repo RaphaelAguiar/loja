@@ -3,14 +3,17 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   Param,
   Post,
   Put,
+  Res,
   UseFilters,
 } from '@nestjs/common';
 import { FiltroErros } from '../error/filtro-erros.filter';
 import { PedidoSimple } from './pedido-simple';
 import { PedidoService } from './pedido.service';
+import { Response } from 'express';
 
 @Controller('pedidos')
 @UseFilters(new FiltroErros())
@@ -53,5 +56,23 @@ export class PedidoController {
   @Post(':codigo/sendemail')
   async sendEmail(@Param('codigo') codigo_do_pedido: number) {
     return await this.pedidoService.sendEmail(+codigo_do_pedido);
+  }
+
+  @Post(':codigo/report')
+  @Header('Content-Type', 'application/pdf')
+  async report(@Param('codigo') codigo_do_pedido: number, @Res() res: Response) {
+    const reference = await this.pedidoService.gerarPdf(+codigo_do_pedido);
+    res.sendFile(
+      reference.path,
+      {
+        root: process.cwd(),
+      },
+      err => {
+        if (err) {
+          throw err;
+        }
+        reference.descartar();
+      },
+    );
   }
 }

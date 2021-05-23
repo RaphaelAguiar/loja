@@ -9,6 +9,7 @@ import { ClienteModule } from '../cliente/cliente.module';
 import { ProdutoModule } from '../produto/produto.module';
 import { PedidoItem } from './pedido-item.entity';
 import { EmailModule } from '../email/email.module';
+import { PdfModule } from '../pdf/pdf.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { EmailModule } from '../email/email.module';
     forwardRef(() => ClienteModule),
     forwardRef(() => ProdutoModule),
     EmailModule,
+    PdfModule,
   ],
   controllers: [PedidoController],
   providers: [

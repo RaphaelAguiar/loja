@@ -176,7 +176,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"codigo_cliente\": 1,\n    \"nome\": \"cliente novo\",\n    \"cpf\": \"88541844030\",\n    \"sexo\": \"masculino\",\n    \"email\": \"email@gmal.com\"\n}",
+							"raw": "{\n    \"codigo_cliente\": 1,\n    \"nome\": \"cliente novo\",\n    \"cpf\": \"88541844030\",\n    \"sexo\": \"masculino\",\n    \"email\": \"raphael.carvalho.de.aguiar@gmail.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -184,14 +184,14 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/produtos/1",
+							"raw": "localhost:3000/clientes/3",
 							"host": [
 								"localhost"
 							],
 							"port": "3000",
 							"path": [
-								"produtos",
-								"1"
+								"clientes",
+								"3"
 							]
 						}
 					},
@@ -284,14 +284,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/produtos/1",
+							"raw": "localhost:3000/produtos/36",
 							"host": [
 								"localhost"
 							],
 							"port": "3000",
 							"path": [
 								"produtos",
-								"1"
+								"36"
 							]
 						}
 					},
@@ -537,7 +537,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"codigo_cliente\": 1,\n    \"data_do_pedido\": \"2021-05-01T00:00:00\",\n    \"forma_de_pagamento\": \"cartao\",\n    \"itens\": [{\n        \"codigo_produto\": 1,\n        \"quantidade\": 3\n    }]\n}",
+							"raw": "{\n    \"codigo_cliente\": 3,\n    \"data_do_pedido\": \"2021-05-01T00:00:00\",\n    \"forma_de_pagamento\": \"cartao\",\n    \"itens\": [{\n        \"codigo_produto\": 1,\n        \"quantidade\": 3\n    }]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -586,20 +586,40 @@
 					"response": []
 				},
 				{
-					"name": "Send email",
+					"name": "Send Email Pedido",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/pedidos/1/sendemail",
+							"raw": "localhost:3000/pedidos/2/sendemail",
 							"host": [
 								"localhost"
 							],
 							"port": "3000",
 							"path": [
 								"pedidos",
-								"1",
+								"2",
 								"sendemail"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download PDF Pedido",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/pedidos/2/report",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"pedidos",
+								"2",
+								"report"
 							]
 						}
 					},

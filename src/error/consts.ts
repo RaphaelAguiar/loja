@@ -54,3 +54,6 @@ export const QUANTIDADE_ITENM_PEDIDO_INVALIDA =
 export const FUNCIONALIDADE_EMAIL_NAO_CONFIGURADA =
   'Funcionalidade de envio de email não configurada';
 export const PEDIDO_EMAIL_NAO_ENCONTRADO = 'Pedido não encontrado';
+
+//Pdf
+export const PEDIDO_PDF_NAO_ENCONTRADO = 'Pedido não encontrado';

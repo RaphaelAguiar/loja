@@ -9,7 +9,7 @@ import { ClienteService } from '../cliente/cliente.service';
 import { ProdutoService } from '../produto/produto.service';
 import { PedidoItem } from './pedido-item.entity';
 import { EmailService } from '../email/email.service';
-
+import { PdfReference, PdfService } from '../pdf/pdf.service';
 @Injectable()
 export class PedidoService {
   constructor(
@@ -19,6 +19,7 @@ export class PedidoService {
     @Inject(forwardRef(() => ProdutoService))
     private readonly produtoService: ProdutoService,
     private readonly emailService: EmailService,
+    private readonly pdfService: PdfService,
   ) {}
 
   async findOne(codigo_do_pedido: number) {
@@ -123,6 +124,30 @@ export class PedidoService {
     return await this.pedidoRepository.save(pedido);
   }
 
+  private simpleTemplate(pedido: Pedido, mode: 'pdf' | 'html'): string {
+    return [
+      'Obrigado pro comprar na Loja',
+      'Seguem os detalhes do seu pedido',
+      `Número do pedido: ${pedido.codigo_do_pedido}`,
+      `Nome do cliente:  ${pedido.cliente.nome}`,
+      `Email do cliente:  ${pedido.cliente.email}`,
+      `CPF do cliente:  ${pedido.cliente.cpf}`,
+      `Gênero do cliente:  ${pedido.cliente.cpf}`,
+      ...pedido.itens.map(item => {
+        return `${item.quantidade} unidade(s) de '${
+          item.produto.nome
+        }' por R$${item.produto.valor.toFixed(2)} (${(
+          item.quantidade * item.produto.valor
+        ).toFixed(2)})`;
+      }),
+      `Total do pedido: ${pedido.itens
+        .reduce((a, p) => a + p.quantidade * p.produto.valor, 0)
+        .toFixed(2)}`,
+    ]
+      .map(l => (mode === 'html' ? `<p>${l}</p>` : l))
+      .join(mode === 'pdf' ? '\n' : '');
+  }
+
   async sendEmail(codigo_do_pedido: number) {
     const pedido = await this.findOne(codigo_do_pedido);
 
@@ -131,35 +156,22 @@ export class PedidoService {
     }
 
     const html =
-      '<html><body>' +
-      [
-        'Obrigado pro comprar na loja',
-        'Seguem os detalhes do seu pedido',
-        `Número do pedido: ${codigo_do_pedido}`,
-        `Nome do cliente:  ${pedido.cliente.nome}`,
-        `Email do cliente:  ${pedido.cliente.email}`,
-        `CPF do cliente:  ${pedido.cliente.cpf}`,
-        `Gênero do cliente:  ${pedido.cliente.cpf}`,
-        ...pedido.itens.map(item => {
-          return `${item.quantidade} unidade de '${
-            item.produto.nome
-          }' por R$${item.produto.valor.toFixed(2)} (${(
-            item.quantidade * item.produto.valor
-          ).toFixed(2)})`;
-        }),
-        `Total do pedido: ${pedido.itens.reduce(
-          (a, p) => a + p.quantidade * p.produto.valor,
-          0,
-        ).toFixed(2)}`,
-      ]
-        .map(l => `<p>${l}</p>`)
-        .join('') +
-      '</body></html>';
+      '<html><body>' + this.simpleTemplate(pedido, 'html') + '</body></html>';
 
     await this.emailService.send({
       to: pedido.cliente.email,
       subject: 'Detalhes do Pedido',
       html,
     });
+  }
+
+  async gerarPdf(codigo_do_pedido: number): Promise<PdfReference> {
+    const pedido = await this.findOne(codigo_do_pedido);
+
+    if (!pedido) {
+      throw new ErroLoja(consts.PEDIDO_PDF_NAO_ENCONTRADO);
+    }
+
+    return await this.pdfService.generate(this.simpleTemplate(pedido, 'pdf'));
   }
 }
